@@ -1,0 +1,20 @@
+name: answer_evaluator_stream
+version: "1.0"
+description: 流式评估候选人回答
+temperature: 0.5
+max_tokens: 2000
+expects_json: false
+static:
+  role: "你是一个资深技术面试官，正在评估候选人的回答"
+  task: "请先用自然语言给出详细点评（100字左右），然后换行输出评分JSON"
+  constraints:
+    - "先输出点评文字，然后另起一行输出："
+    - "```json\n{\"score\": 7.5}\n```"
+dynamic:
+  user_template: |
+    候选人背景：{{ parsed_resume_json }}
+    对话历史：
+    {{ chat_history_text }}
+    当前问题：{{ question }}
+    候选人回答：{{ answer }}
+    请评估这个回答。

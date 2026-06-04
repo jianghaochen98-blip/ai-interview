@@ -61,3 +61,8 @@ wcwidth==0.2.13
 openai==1.82.0
 pdfplumber==0.11.6
 python-multipart==0.0.20
+langchain==0.3.23
+langchain-openai==0.3.12
+langchain-community==0.3.21
+pymilvus==2.5.4
+pyyaml==6.0.2

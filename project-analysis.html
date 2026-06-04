@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智面 AI-Interview · 功能场景技术实现全景分析</title>
+<style>
+:root{--c1:#667eea;--c2:#764ba2;--c3:#48bb78;--c4:#ed8936;--c5:#4299e1;--c6:#ed64a6;--c7:#9f7aea;--c8:#a0aec0;--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#e2e8f0;--muted:#94a3b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Microsoft YaHei',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.container{max-width:1280px;margin:0 auto;padding:0 24px 80px}
+header{text-align:center;padding:48px 20px 32px;border-bottom:1px solid var(--border);margin-bottom:40px}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--c1),var(--c6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--muted);margin-top:6px;font-size:0.95rem}
+.section{margin:48px 0}
+.section-title{font-size:1.3rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-title .num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:0.85rem;font-weight:800;color:#fff;flex-shrink:0}
+.section-title .num.f1{background:var(--c3)}.section-title .num.f2{background:var(--c4)}.section-title .num.f3{background:var(--c5)}.section-title .num.f4{background:var(--c6)}
+h3{font-size:1rem;font-weight:700;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--c1)}
+h4{font-size:0.9rem;font-weight:600;margin:16px 0 8px;color:var(--c5)}
+/* table */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th,td{padding:8px 14px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--card);color:var(--muted);font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;position:sticky;top:0}
+tr:hover td{background:rgba(102,126,234,0.06)}
+td code{background:rgba(102,126,234,0.15);padding:2px 6px;border-radius:4px;font-size:0.78rem}
+/* tags */
+.tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:0.7rem;margin:2px 4px 2px 0;font-weight:600;font-family:'Consolas','Courier New',monospace}
+.tag.c1{background:rgba(102,126,234,0.2);color:#a5b4fc}
+.tag.c2{background:rgba(118,75,162,0.2);color:#c4b5fd}
+.tag.c3{background:rgba(72,187,120,0.2);color:#86efac}
+.tag.c4{background:rgba(237,137,54,0.2);color:#fdba74}
+.tag.c5{background:rgba(66,153,225,0.2);color:#93c5fd}
+.tag.c6{background:rgba(237,100,166,0.2);color:#f9a8d4}
+.tag.c7{background:rgba(159,122,234,0.2);color:#c4b5fd}
+.tag.c8{background:rgba(160,174,192,0.2);color:#cbd5e1}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;margin:16px 0}
+.card{background:var(--card);border-radius:10px;border:1px solid var(--border);padding:18px 20px}
+.card h5{font-size:0.85rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.card p,.card li{font-size:0.8rem;color:var(--muted);margin:2px 0}
+.card ul{padding-left:18px}
+.card .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.68rem;font-weight:700;margin-right:4px}
+.pill.fe{background:rgba(72,187,120,0.2);color:#86efac}
+.pill.be{background:rgba(66,153,225,0.2);color:#93c5fd}
+.pill.db{background:rgba(159,122,234,0.2);color:#c4b5fd}
+.pill.ai{background:rgba(237,100,166,0.2);color:#f9a8d4}
+.pill.inf{background:rgba(160,174,192,0.2);color:#cbd5e1}
+/* feature items */
+.ft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.ft-item{background:var(--card);border-radius:8px;padding:14px 16px;border:1px solid var(--border)}
+.ft-item .ft-name{font-weight:700;font-size:0.85rem;margin-bottom:4px}
+.ft-item .ft-desc{font-size:0.75rem;color:var(--muted)}
+.ft-item .ft-tech{margin-top:6px}
+/* quote */
+blockquote{background:var(--card);border-left:3px solid var(--c1);padding:12px 18px;margin:12px 0;border-radius:0 8px 8px 0;font-size:0.82rem;color:var(--muted)}
+blockquote strong{color:var(--text)}
+/* columns */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0}
+@media(max-width:768px){.cols{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.ft-grid{grid-template-columns:1fr}}
+/* scroll-table */
+.scroll{max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:8px}
+.scroll table{margin:0}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>智面 AI-Interview</h1>
+  <p>功能清单 · 应用场景 · 技术栈 · 实现原理</p>
+</header>
+
+<!-- ======================== 1. FUNCTION FEATURES ======================== -->
+<div class="section">
+  <div class="section-title"><span class="num f1">1</span> 功能清单 Feature Inventory</div>
+
+  <h3>1.1 用户端 (7 个页面)</h3>
+  <div class="ft-grid">
+    <div class="ft-item">
+      <div class="ft-name">用户注册</div>
+      <div class="ft-desc">姓/名/邮箱/密码注册，自动登录，跳转仪表盘</div>
+      <div class="ft-tech"><span class="tag c1">JWT</span><span class="tag c7">bcrypt</span><span class="tag c5">Pinia</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">用户登录</div>
+      <div class="ft-desc">邮箱+密码登录，记住登录状态，获取头像/用户名</div>
+      <div class="ft-tech"><span class="tag c1">双Token</span><span class="tag c5">localStorage</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">面试仪表盘</div>
+      <div class="ft-desc">历史面试列表（岗位/难度/题数/总分/日期/状态），继续/查看报告/删除</div>
+      <div class="ft-tech"><span class="tag c3">列表渲染</span><span class="tag c5">分状态筛选</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">简历上传</div>
+      <div class="ft-desc">PDF拖拽/点击上传 ≤10MB，输入目标岗位</div>
+      <div class="ft-tech"><span class="tag c6">pdfplumber</span><span class="tag c5">文件存储</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">简历AI解析</div>
+      <div class="ft-desc">提取姓名/学历/技能/经历/项目/总结，结构化展示</div>
+      <div class="ft-tech"><span class="tag c6">DeepSeek</span><span class="tag c6">JSON输出</span><span class="tag c6">Prompt工程</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">简历AI分析</div>
+      <div class="ft-desc">综合评分/匹配技能/缺失技能/优势/劣势/改进建议</div>
+      <div class="ft-tech"><span class="tag c6">自适应评估</span><span class="tag c6">实习vs正式</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">AI生成面试题</div>
+      <div class="ft-desc">根据简历+岗位+难度(低/中/高)+题数(3/5/8)智能出题</div>
+      <div class="ft-tech"><span class="tag c6">LLM出题</span><span class="tag c6">自适应难度</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">实时AI面试</div>
+      <div class="ft-desc">聊天式对话界面，AI头像动画，作答后AI实时流式评分</div>
+      <div class="ft-tech"><span class="tag c6">SSE流式</span><span class="tag c5">ReadableStream</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">面试评估报告</div>
+      <div class="ft-desc">总分雷达/录用建议/总结/优势劣势/改进建议/逐题评分</div>
+      <div class="ft-tech"><span class="tag c6">综合评分</span><span class="tag c3">可视化图表</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">个人中心</div>
+      <div class="ft-desc">头像上传、个人信息编辑、密码修改</div>
+      <div class="ft-tech"><span class="tag c5">文件上传</span><span class="tag c7">密码验证</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">邮箱验证</div>
+      <div class="ft-desc">注册/找回密码时发送验证码，Redis存储TTL过期</div>
+      <div class="ft-tech"><span class="tag c7">Redis TTL</span><span class="tag c8">Celery异步</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">令牌刷新</div>
+      <div class="ft-desc">Access Token过期自动用Refresh Token刷新，多设备支持</div>
+      <div class="ft-tech"><span class="tag c1">HS256</span><span class="tag c1">双令牌体系</span></div>
+    </div>
+  </div>
+
+  <h3>1.2 管理后台 (5 个页面)</h3>
+  <div class="ft-grid">
+    <div class="ft-item">
+      <div class="ft-name">管理员登录</div>
+      <div class="ft-desc">独立认证体系，JWT scope="backoffice"，默认管理员账号内置</div>
+      <div class="ft-tech"><span class="tag c4">独立认证</span><span class="tag c1">Scope隔离</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">数据概览</div>
+      <div class="ft-desc">4张统计卡片：注册用户数/上传简历数/总面试数/已完成面试数</div>
+      <div class="ft-tech"><span class="tag c5">统计聚合</span><span class="tag c3">卡片展示</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">用户管理</div>
+      <div class="ft-desc">分页列表，模糊搜索（邮箱/姓名），启用/禁用用户</div>
+      <div class="ft-tech"><span class="tag c5">分页</span><span class="tag c5">防抖搜索</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">面试记录管理</div>
+      <div class="ft-desc">分页列表，状态筛选，查看详情，删除面试</div>
+      <div class="ft-tech"><span class="tag c5">状态过滤</span><span class="tag c5">级联删除</span></div>
+    </div>
+    <div class="ft-item">
+      <div class="ft-name">面试详情查看</div>
+      <div class="ft-desc">基本信息+AI报告+完整对话记录+逐条评分反馈</div>
+      <div class="ft-tech"><span class="tag c5">详情展示</span><span class="tag c6">AI数据展示</span></div>
+    </div>
+  </div>
+
+  <h3>1.3 后端功能</h3>
+  <div class="scroll"><table>
+    <tr><th>模块</th><th>端点</th><th>方法</th><th>功能</th></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/register</code></td><td>POST</td><td>用户注册</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/login</code></td><td>POST</td><td>用户登录</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/refresh</code></td><td>POST</td><td>刷新令牌</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/logout</code></td><td>POST</td><td>登出（令牌失效）</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/me</code></td><td>GET/PUT</td><td>获取/更新个人资料</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/me/avatar</code></td><td>POST</td><td>上传头像</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/me/change-password</code></td><td>POST</td><td>修改密码</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/send-verification-code</code></td><td>POST</td><td>发送邮箱验证码</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/verify-email</code></td><td>POST</td><td>验证邮箱</td></tr>
+    <tr><td>auth</td><td><code>/api/v1/auth/password-reset/*</code></td><td>POST</td><td>找回密码（3步流程）</td></tr>
+    <tr><td>resumes</td><td><code>/api/v1/resumes/upload</code></td><td>POST</td><td>上传PDF简历+触发AI解析</td></tr>
+    <tr><td>resumes</td><td><code>/api/v1/resumes/{id}</code></td><td>GET</td><td>获取简历详情（含解析分析结果）</td></tr>
+    <tr><td>resumes</td><td><code>/api/v1/resumes</code></td><td>GET</td><td>获取用户全部简历列表</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/start</code></td><td>POST</td><td>创建新面试+AI出题</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/{id}/answer</code></td><td>POST</td><td>提交答案（非流式）</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/{id}/answer/stream</code></td><td>POST</td><td>提交答案（SSE流式评分）</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/{id}/report</code></td><td>GET</td><td>获取面试报告</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/{id}/messages</code></td><td>GET</td><td>获取对话记录</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews/{id}</code></td><td>DELETE</td><td>删除面试</td></tr>
+    <tr><td>interviews</td><td><code>/api/v1/interviews</code></td><td>GET</td><td>面试历史列表</td></tr>
+    <tr><td>config</td><td><code>/api/v1/config/health</code></td><td>GET</td><td>健康检查（DB+Redis连通性）</td></tr>
+    <tr><td>backoffice/auth</td><td><code>/api/v1/backoffice/auth/login</code></td><td>POST</td><td>管理员登录</td></tr>
+    <tr><td>backoffice/users</td><td><code>/api/v1/backoffice/users</code></td><td>GET</td><td>用户列表（分页+搜索）</td></tr>
+    <tr><td>backoffice/users</td><td><code>/api/v1/backoffice/users/{id}/toggle-active</code></td><td>PUT</td><td>启用/禁用用户</td></tr>
+    <tr><td>backoffice/users</td><td><code>/api/v1/backoffice/users/stats</code></td><td>GET</td><td>平台统计数据</td></tr>
+    <tr><td>backoffice/interviews</td><td><code>/api/v1/backoffice/interviews</code></td><td>GET</td><td>面试列表（分页+状态过滤）</td></tr>
+    <tr><td>backoffice/interviews</td><td><code>/api/v1/backoffice/interviews/{id}</code></td><td>GET/DELETE</td><td>查看/删除面试</td></tr>
+  </table></div>
+</div>
+
+<!-- ======================== 2. APPLICATION SCENARIOS ======================== -->
+<div class="section">
+  <div class="section-title"><span class="num f2">2</span> 应用场景 Application Scenarios</div>
+
+  <div class="cards">
+    <div class="card">
+      <h5><span class="pill fe">场景1</span> 求职者面试模拟训练</h5>
+      <ul>
+        <li>求职者注册、上传简历、获得AI简历分析</li>
+        <li>选择目标岗位和难度，AI根据简历内容生成个性化面试题</li>
+        <li>进行多轮仿真面试，AI实时流式评分反馈</li>
+        <li>获得完整评估报告（总分、维度分、优势劣势、录用建议）</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>程序员、产品经理、设计师等求职者</p>
+    </div>
+    <div class="card">
+      <h5><span class="pill fe">场景2</span> 校招生/实习生面试准备</h5>
+      <ul>
+        <li>系统检测"实习/intern"关键词，自动调整评估标准</li>
+        <li>不因缺乏工作经验扣分，侧重基础和潜力</li>
+        <li>出题难度自动降低，聚焦基础知识考核</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>应届生、实习生候选人</p>
+    </div>
+    <div class="card">
+      <h5><span class="pill fe">场景3</span> 资深人士高阶面试模拟</h5>
+      <ul>
+        <li>岗位匹配更高难度题目（系统设计、性能优化、架构决策）</li>
+        <li>更严格的评分标准，强调生产经验和深度</li>
+        <li>全链路技术面试模拟</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>高级/资深工程师</p>
+    </div>
+    <div class="card">
+      <h5><span class="pill be">场景4</span> HR/招聘方平台管理</h5>
+      <ul>
+        <li>查看平台整体使用数据统计</li>
+        <li>管理用户账户（启用/禁用）</li>
+        <li>查看所有面试记录和详情</li>
+        <li>审查AI评估结果和完整对话记录</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>HR、管理员、平台运营</p>
+    </div>
+    <div class="card">
+      <h5><span class="pill fe">场景5</span> 纯简历质量评估</h5>
+      <ul>
+        <li>不上传岗位也可以做简历分析</li>
+        <li>AI评估简历综合质量、技能匹配度</li>
+        <li>输出优势/劣势/改进建议</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>所有需要简历优化的用户</p>
+    </div>
+    <div class="card">
+      <h5><span class="pill ai">场景6</span> 多岗位多轮面试对比</h5>
+      <ul>
+        <li>针对同一份简历可创建多次面试</li>
+        <li>换不同岗位/不同难度对比表现</li>
+        <li>通过仪表盘管理所有历史面试</li>
+      </ul>
+      <p style="margin-top:6px"><strong>目标用户：</strong>海投型求职者</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== 3. TECHNOLOGY STACK ======================== -->
+<div class="section">
+  <div class="section-title"><span class="num f3">3</span> 技术栈 Technology Stack</div>
+
+  <div class="cols">
+    <div>
+      <h4>后端 Backend</h4>
+      <div class="scroll" style="max-height:380px"><table>
+        <tr><th>类别</th><th>技术</th></tr>
+        <tr><td>语言</td><td>Python 3.12+</td></tr>
+        <tr><td>Web框架</td><td><code>FastAPI 0.115</code> (异步)</td></tr>
+        <tr><td>ASGI服务器</td><td><code>Uvicorn 0.34</code></td></tr>
+        <tr><td>ORM</td><td><code>SQLAlchemy 2.0</code> (异步ORM)</td></tr>
+        <tr><td>数据库驱动</td><td><code>asyncpg 0.29</code></td></tr>
+        <tr><td>数据库</td><td>PostgreSQL 16 (Alpine Docker)</td></tr>
+        <tr><td>缓存/MQ</td><td>Redis 7 (Alpine Docker)</td></tr>
+        <tr><td>异步任务</td><td><code>Celery 5.5</code> (Worker + Beat)</td></tr>
+        <tr><td>认证</td><td><code>python-jose 3.4</code> (JWT HS256)</td></tr>
+        <tr><td>密码加密</td><td><code>passlib 1.7</code> + bcrypt</td></tr>
+        <tr><td>数据校验</td><td><code>Pydantic 2.11</code></td></tr>
+        <tr><td>AI模型</td><td>DeepSeek API (OpenAI SDK兼容)</td></tr>
+        <tr><td>AI SDK</td><td><code>openai 1.82</code></td></tr>
+        <tr><td>PDF解析</td><td><code>pdfplumber 0.11</code></td></tr>
+        <tr><td>数据库迁移</td><td><code>Alembic 1.15</code></td></tr>
+        <tr><td>邮件</td><td><code>fastapi-mail</code> + <code>Jinja2</code></td></tr>
+        <tr><td>文件存储</td><td>AWS S3 (<code>boto3</code>)</td></tr>
+        <tr><td>任务调度</td><td>APScheduler + Celery Beat</td></tr>
+        <tr><td>配置管理</td><td><code>pydantic-settings</code></td></tr>
+      </table></div>
+    </div>
+    <div>
+      <h4>前端 Frontend</h4>
+      <div class="scroll" style="max-height:380px"><table>
+        <tr><th>类别</th><th>技术</th></tr>
+        <tr><td>框架</td><td>Vue 3 (Composition API)</td></tr>
+        <tr><td>构建工具</td><td>Vite 5</td></tr>
+        <tr><td>路由</td><td>Vue Router 4</td></tr>
+        <tr><td>状态管理</td><td>Pinia 2</td></tr>
+        <tr><td>HTTP客户端</td><td>Axios 1.7</td></tr>
+        <tr><td>SSE流式</td><td>原生 Fetch API (ReadableStream)</td></tr>
+        <tr><td>CSS</td><td>全局CSS + scoped组件样式</td></tr>
+        <tr><td>图标</td><td>SVG内联 (AI头像动画)</td></tr>
+      </table>
+
+      <h4 style="margin-top:20px">基础设施 DevOps</h4>
+      <table>
+        <tr><th>类别</th><th>技术</th></tr>
+        <tr><td>容器化</td><td>Docker + Docker Compose v2</td></tr>
+        <tr><td>反向代理</td><td>Nginx (Alpine)</td></tr>
+        <tr><td>Web服务器</td><td>Nginx (80/443端口)</td></tr>
+        <tr><td>监控</td><td>Flower (Celery dashboard)</td></tr>
+        <tr><td>部署</td><td>Ubuntu 18.04+ VM (VMware)</td></tr>
+        <tr><td>共享文件夹</td><td>VMware Tools (vmhgfs-fuse)</td></tr>
+        <tr><td>网络</td><td>VMware NAT + 静态IP</td></tr>
+      </table>
+
+      <h4 style="margin-top:20px">项目结构</h4>
+      <table>
+        <tr><th>子项目</th><th>入口</th><th>端口</th></tr>
+        <tr><td>用户前端</td><td><code>ai-interview-frontend/</code></td><td>3000</td></tr>
+        <tr><td>管理后台</td><td><code>ai-interview-admin/</code></td><td>3001</td></tr>
+        <tr><td>后端API</td><td><code>ai-interview-backend/</code></td><td>8006</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== 4. IMPLEMENTATION DETAILS ======================== -->
+<div class="section">
+  <div class="section-title"><span class="num f4">4</span> 关键实现原理 Implementation Details</div>
+
+  <h3>4.1 认证体系：双Token + 双Scope</h3>
+  <div class="cols">
+    <div>
+      <blockquote>
+        <strong>Access Token</strong>（30分钟有效）：包含 user_id、email、scope 字段，HS256签名。每次请求校验签名和scope即可，<em>无需查库</em>。<br>
+        <strong>Refresh Token</strong>（7~30天有效）：bcrypt哈希后存入 tokens 表，使用时查库比对哈希值。<br>
+        <strong>Scope隔离</strong>：客户端JWT scope="client"，后台JWT scope="backoffice"，防止越权。
+      </blockquote>
+    </div>
+    <div>
+      <table>
+        <tr><th>步骤</th><th>说明</th></tr>
+        <tr><td>登录</td><td>验证密码 → 签发双Token → 哈希RefreshToken存库</td></tr>
+        <tr><td>请求</td><td>Axios拦截器附加 Bearer Access Token</td></tr>
+        <tr><td>校验</td><td>verify_token() 校验签名+scope+有效期</td></tr>
+        <tr><td>过期</td><td>401 → 用RefreshToken换新AccessToken</td></tr>
+        <tr><td>登出</td><td>标记RefreshToken失效 → 清除前端token</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>4.2 简历处理流水线</h3>
+  <blockquote>
+    <strong>上传PDF</strong> → <strong>pdfplumber逐页提取文本</strong> → <strong>AI解析</strong>（DeepSeek输出结构化JSON：姓名/学历/技能/经历/项目/总结）→ <strong>AI分析</strong>（DeepSeek输出评估JSON：总分/匹配技能/缺失技能/优势/劣势/建议）→ <strong>前端轮询状态</strong>（每2秒，最多30次，含动画进度条）
+  </blockquote>
+  <p style="font-size:0.8rem;color:var(--muted)">
+    自适应评估：检测目标岗位是否含"实习/intern"关键词 → 调整AI Prompt中评估标准，实习岗不因无工作经历扣分
+  </p>
+
+  <h3>4.3 AI出题机制</h3>
+  <div class="cols">
+    <div>
+      <h4>输入参数</h4>
+      <table>
+        <tr><td>简历解析JSON</td><td>姓名、学历、技能、项目经历</td></tr>
+        <tr><td>目标岗位</td><td>前端/后端/数据分析/产品经理等</td></tr>
+        <tr><td>难度等级</td><td>easy / medium / hard</td></tr>
+        <tr><td>题目数量</td><td>3 / 5 / 8 题</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>输出格式</h4>
+      <table>
+        <tr><td>第1题</td><td>自我介绍（固定）</td></tr>
+        <tr><td>分类体系</td><td>self-intro / project / technical / coding / system-design / behavioral</td></tr>
+        <tr><td>题目结构</td><td>{"index":0, "question":"...", "category":"technical"}</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="font-size:0.8rem;color:var(--muted);margin-top:8px">
+    自适应策略：实习岗降低难度，默认难度映射不同Prompt描述；Token预算优化：只用最后6轮对话作为上下文
+  </p>
+
+  <h3>4.4 SSE 流式评分 —— 核心创新</h3>
+  <div class="cols">
+    <div>
+      <h4>后端实现</h4>
+      <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:6px;font-size:0.72rem;color:#86efac;line-height:1.5;overflow-x:auto">
+# interview_service.py
+async def submit_answer_stream(interview_id, answer, user):
+    # 1. 保存候选人作答到DB
+    await save_candidate_message(...)
+
+    # 2. 异步生成器：流式调用AI
+    async def generate():
+        async for chunk in ai_service.evaluate_answer_stream(...):
+            yield f"data: {json.dumps({'type':'chunk','content':chunk})}\n\n"
+
+        # 3. 流结束后提取分数，保存到DB
+        score = extract_score(full_text)
+        await update_message_score(...)
+
+        # 4. 生成下一题或结束
+        if not is_last:
+            next_q = next_question(...)
+            yield f"data: {json.dumps({'type':'done','next_question':next_q})}\n\n"
+        else:
+            report = await generate_report(...)
+            yield f"data: {json.dumps({'type':'done','is_finished':True,'report':report})}\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+</pre>
+    </div>
+    <div>
+      <h4>前端实现</h4>
+      <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:6px;font-size:0.72rem;color:#93c5fd;line-height:1.5;overflow-x:auto">
+// interview.js
+async function submitAnswerStream(interviewId, answer, { onChunk, onDone }) {
+    const res = await fetch(`/api/v1/interviews/${interviewId}/answer/stream`, {
+        method: 'POST',
+        body: JSON.stringify({ answer }),
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+
+    const reader = res.body.getReader()
+    let buffer = ''
+    const decoder = new TextDecoder()
+
+    while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+
+        // 按 \n\n 分割SSE事件
+        const parts = buffer.split('\n\n')
+        buffer = parts.pop()
+
+        for (const part of parts) {
+            const lines = part.split('\n')
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = JSON.parse(line.slice(6))
+                    if (data.type === 'chunk') {
+                        // 实时过滤JSON块，防止显示原始分数数据
+                        onChunk(filterJsonBlocks(data.content))
+                    } else if (data.type === 'done') {
+                        onDone(data)
+                    }
+                }
+            }
+        }
+    }
+}
+</pre>
+    </div>
+  </div>
+  <blockquote>
+    <strong>关键技术点：</strong>① ReadableStream 逐块读取避免阻塞 ② buffer 残差处理解决TCP分片问题 ③ 前端实时过滤JSON分数块避免视觉污染 ④ 流结束统一保存DB确保数据一致性
+  </blockquote>
+
+  <h3>4.5 评分与报告生成</h3>
+  <div class="cols">
+    <div>
+      <h4>逐题评分</h4>
+      <ul style="font-size:0.8rem;color:var(--muted)">
+        <li>AI评估每题答案（结合简历背景 + 题目要求）</li>
+        <li>输出：score(0-10) + feedback + follow_up标志</li>
+        <li>评分Prompt先输出自然语言评语 → 再输出JSON分数</li>
+      </ul>
+    </div>
+    <div>
+      <h4>综合报告</h4>
+      <ul style="font-size:0.8rem;color:var(--muted)">
+        <li>overall_score = round(所有单题分平均, 1)</li>
+        <li>AI生成：summary / strengths / weaknesses / suggestions / hire_recommendation</li>
+        <li>逐题分由Service层计算（不用AI）保证精确</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>4.6 三层架构 &amp; 统一响应</h3>
+  <div class="cols">
+    <div>
+      <table>
+        <tr><th>层</th><th>职责</th><th>示例</th></tr>
+        <tr><td><span class="tag c1">Route</span></td><td>请求校验 / 依赖注入 / 响应格式化</td><td>Pydantic schemas验证输入</td></tr>
+        <tr><td><span class="tag c5">Service</span></td><td>业务逻辑 / 编排调用 / 事务管理</td><td>InterviewService编排AI+DB</td></tr>
+        <tr><td><span class="tag c7">Model</span></td><td>数据库表定义 / 关系映射</td><td>SQLAlchemy ORM模型</td></tr>
+      </table>
+    </div>
+    <div>
+      <table>
+        <tr><th>统一响应格式</th></tr>
+        <tr><td><code>{"code":200, "message":"Success", "data":{...}}</code></td></tr>
+        <tr><td><code>{"code":40001, "message":"邮箱已注册", "data":null}</code></td></tr>
+        <tr><td><code>{"code":200, "message":"Success", "data":{"items":[...],"total":42,"page":1,"page_size":10}}</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>4.7 数据库设计 (9张表)</h3>
+  <div class="scroll"><table>
+    <tr><th>表名</th><th>用途</th><th>关键字段</th></tr>
+    <tr><td><code>users</code></td><td>注册用户</td><td>id, email, hashed_password, first_name, last_name, avatar_url, gender, phone, university, career_goal, location, is_active</td></tr>
+    <tr><td><code>admins</code></td><td>管理员</td><td>id, email, hashed_password, role(admin/superadmin)</td></tr>
+    <tr><td><code>tokens</code></td><td>用户RefreshToken黑名单</td><td>id, user_id, token_hash, expires_at, is_revoked</td></tr>
+    <tr><td><code>admin_tokens</code></td><td>管理员RefreshToken黑名单</td><td>id, admin_id, token_hash, expires_at, is_revoked</td></tr>
+    <tr><td><code>resumes</code></td><td>简历</td><td>id, user_id, file_url, parsed_content(JSONB), analysis(JSONB), status, target_position</td></tr>
+    <tr><td><code>interviews</code></td><td>面试会话</td><td>id, user_id, resume_id, target_position, difficulty, total_questions, current_question_index, questions_data(JSONB), overall_score, report, status</td></tr>
+    <tr><td><code>interview_messages</code></td><td>面试消息</td><td>id, interview_id, role(interviewer/candidate), content, question_index, score, feedback</td></tr>
+    <tr><td><code>waiting_list</code></td><td>邀请注册名单</td><td>id, email, status, invited_at</td></tr>
+    <tr><td><code>alembic_version</code></td><td>迁移版本号</td><td>version_num</td></tr>
+  </table></div>
+
+  <h3>4.8 Docker Compose 部署架构</h3>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:12px 0">
+    <table>
+      <tr><th>服务</th><th>容器名</th><th>端口</th><th>说明</th></tr>
+      <tr><td><span class="tag c5">app</span></td><td>ai-interview-app</td><td>8006</td><td>FastAPI (uvicorn, host网络模式)</td></tr>
+      <tr><td><span class="tag c7">postgres</span></td><td>ai-interview-postgres</td><td>5434</td><td>PostgreSQL 16 (数据卷持久化)</td></tr>
+      <tr><td><span class="tag c7">redis</span></td><td>ai-interview-redis</td><td>6382</td><td>Redis 7 (数据卷持久化)</td></tr>
+      <tr><td><span class="tag c8">celery-worker</span></td><td>ai-interview-celery-worker</td><td>-</td><td>异步任务处理（邮件等）</td></tr>
+      <tr><td><span class="tag c8">celery-beat</span></td><td>ai-interview-celery-beat</td><td>-</td><td>定时任务调度</td></tr>
+      <tr><td><span class="tag c8">nginx</span></td><td>ai-interview-nginx</td><td>8080/8443</td><td>反向代理+静态文件</td></tr>
+      <tr><td><span class="tag c8">flower</span></td><td>ai-interview-flower</td><td>5555</td><td>Celery监控面板(可选)</td></tr>
+    </table>
+    <blockquote>
+      <strong>网络：</strong>app-network桥接网络 · <strong>健康检查：</strong>所有服务配置healthcheck · <strong>环境：</strong>dev/prod通过docker-compose覆盖文件分离
+    </blockquote>
+  </div>
+
+  <h3>4.9 前端状态管理 (Pinia)</h3>
+  <div class="cols">
+    <div>
+      <h4>用户端 AuthStore</h4>
+      <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:6px;font-size:0.72rem;color:#86efac;line-height:1.5">
+state: {
+  token, refreshToken,
+  userEmail, userId, userName, userAvatar
+}
+getters: { isLoggedIn }
+actions: {
+  setAuth(data),       // 登录/注册后
+  setUserInfo(info),   // 获取资料后
+  logout()             // 清除所有
+}
+// 所有state持久化到localStorage
+</pre>
+    </div>
+    <div>
+      <h4>Axios 拦截器</h4>
+      <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:6px;font-size:0.72rem;color:#93c5fd;line-height:1.5">
+// 请求拦截
+config.headers.Authorization = `Bearer ${token}`
+
+// 响应拦截
+if (res.data.code === 200) return res.data.data
+if (401/403) { authStore.logout(); redirect('/login') }
+if (422) 提取FastAPI validation errors
+</pre>
+    </div>
+  </div>
+
+  <h3>4.10 路由守卫 &amp; 导航</h3>
+  <table>
+    <tr><th>端</th><th>路径</th><th>页面</th><th>认证</th></tr>
+    <tr><td>用户</td><td><code>/</code> → <code>/dashboard</code></td><td>重定向</td><td>-</td></tr>
+    <tr><td>用户</td><td><code>/login</code></td><td>登录</td><td>否</td></tr>
+    <tr><td>用户</td><td><code>/register</code></td><td>注册</td><td>否</td></tr>
+    <tr><td>用户</td><td><code>/dashboard</code></td><td>仪表盘</td><td>是</td></tr>
+    <tr><td>用户</td><td><code>/resume/upload</code></td><td>简历上传</td><td>是</td></tr>
+    <tr><td>用户</td><td><code>/interview/:id</code></td><td>实时面试</td><td>是</td></tr>
+    <tr><td>用户</td><td><code>/interview/:id/report</code></td><td>面试报告</td><td>是</td></tr>
+    <tr><td>用户</td><td><code>/profile</code></td><td>个人中心</td><td>是</td></tr>
+    <tr><td>后台</td><td><code>/login</code></td><td>管理员登录</td><td>否</td></tr>
+    <tr><td>后台</td><td><code>/</code></td><td>数据概览</td><td>是</td></tr>
+    <tr><td>后台</td><td><code>/users</code></td><td>用户管理</td><td>是</td></tr>
+    <tr><td>后台</td><td><code>/interviews</code></td><td>面试记录</td><td>是</td></tr>
+    <tr><td>后台</td><td><code>/interviews/:id</code></td><td>面试详情</td><td>是</td></tr>
+  </table>
+
+  <h3>4.11 日志系统</h3>
+  <div class="cols">
+    <div>
+      <ul style="font-size:0.8rem;color:var(--muted)">
+        <li><strong>RedisLogHandler</strong>：日志推送到Redis list集中收集</li>
+        <li><strong>LogQueueProcessor</strong>：后台线程批量刷写，避免IO阻塞</li>
+        <li><strong>SafeTimedRotatingFileHandler</strong>：多进程安全的按日轮转</li>
+        <li><strong>主进程检测</strong>：文件锁确保单份日志写入</li>
+        <li>抑制噪音库日志：pdfminer、python-multipart</li>
+      </ul>
+    </div>
+    <div>
+      <ul style="font-size:0.8rem;color:var(--muted)">
+        <li><strong>环境感知</strong>：dev=DEBUG, test=INFO, prod=WARNING</li>
+        <li><strong>SQLAlchemy引擎独立日志</strong>：单独文件</li>
+        <li><strong>异步消费</strong>：consume_logs_forever() 从Redis消费</li>
+        <li><strong>格式统一</strong>：时间、级别、模块、消息</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+</div>
+</body>
+</html>

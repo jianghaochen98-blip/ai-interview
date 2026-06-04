@@ -32,6 +32,14 @@ async def lifespan(application: FastAPI):
     setup_logging()
     logger.info("Application starting up")
 
+    # 初始化 Milvus 向量数据库
+    try:
+        from app.rag.milvus_client import milvus_store
+        milvus_store.create_collection()
+        logger.info(f"Milvus 集合已就绪: {milvus_store.collection_name}")
+    except Exception as e:
+        logger.warning(f"Milvus 初始化失败（RAG 功能不可用）: {e}")
+
     # 日志消费线程（仅主进程启动，防止多进程重复）
     if is_master_process():
         try:

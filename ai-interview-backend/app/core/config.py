@@ -77,6 +77,17 @@ class Settings(BaseSettings):
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
     DEEPSEEK_MODEL: str = "deepseek-chat"
 
+    # Embedding 配置（DashScope / OpenAI 兼容）
+    EMBEDDING_API_KEY: str = ""
+    EMBEDDING_BASE_URL: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    EMBEDDING_MODEL: str = "text-embedding-v3"
+    EMBEDDING_DIMENSION: int = 1536
+
+    # Milvus 配置
+    MILVUS_HOST: str = "localhost"
+    MILVUS_PORT: int = 19530
+    MILVUS_COLLECTION_NAME: str = "knowledge_base"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"  # 可选，指定编码

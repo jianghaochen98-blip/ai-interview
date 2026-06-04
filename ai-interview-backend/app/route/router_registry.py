@@ -86,6 +86,11 @@ BACKOFFICE_ROUTES = [
         prefix=f"{settings.API_V1_STR}/backoffice/interviews",
         tags=["backoffice-interviews"]
     ),
+    RouteConfig(
+        module_path="app.api.backoffice.v1.knowledge",
+        prefix=f"{settings.API_V1_STR}/backoffice/knowledge",
+        tags=["backoffice-knowledge"]
+    ),
 ]
 
 # 公共路由配置（不分客户端和后台的路由）
